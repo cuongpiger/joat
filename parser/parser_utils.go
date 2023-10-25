@@ -2,7 +2,11 @@ package parser
 
 import "github.com/cuongpiger/joat/parser/entity"
 
-func NewParser() (IParser, error) {
+func GetParser() (IParser, error) {
+	return newParser()
+}
+
+func newParser() (IParser, error) {
 	parserOnce.Do(func() {
 		parserIns = new(entity.Parser)
 	})
