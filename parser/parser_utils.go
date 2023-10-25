@@ -7,5 +7,6 @@ func NewParser() (IParser, error) {
 		parserIns = new(entity.Parser)
 	})
 
+	// currently, there is no error to return
 	return parserIns, nil
 }
