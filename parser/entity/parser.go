@@ -15,7 +15,7 @@ import (
 type Parser struct {
 }
 
-func (s *Parser) MapMe(pObj interface{}, parent string) (map[string]interface{}, error) {
+func (s *Parser) MapMe(pObj interface{}, pParent string) (map[string]interface{}, error) {
 	objValue := reflect.ValueOf(pObj)
 
 	// if the pObj is a pointer, get the underlying value
@@ -144,8 +144,8 @@ func (s *Parser) MapMe(pObj interface{}, parent string) (map[string]interface{},
 			return nil, err
 		}
 
-		if parent != "" {
-			objMap = map[string]interface{}{parent: objMap}
+		if pParent != "" {
+			objMap = map[string]interface{}{pParent: objMap}
 		}
 
 		return objMap, nil
