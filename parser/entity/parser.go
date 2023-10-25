@@ -3,18 +3,97 @@ package entity
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"reflect"
+	"strconv"
 	"strings"
 
+	lError "github.com/cuongpiger/joat/error"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-
-	lError "github.com/cuongpiger/joat/error"
 )
 
 type Parser struct {
 }
 
+func (s *Parser) UrlMe(pObj interface{}) (*url.URL, error) {
+	objValue := reflect.ValueOf(pObj)
+	if objValue.Kind() == reflect.Ptr {
+		objValue = objValue.Elem()
+	}
+
+	objType := reflect.TypeOf(pObj)
+	if objType.Kind() == reflect.Ptr {
+		objType = objType.Elem()
+	}
+
+	params := url.Values{}
+	if objValue.Kind() == reflect.Struct {
+		for i := 0; i < objValue.NumField(); i++ {
+			v := objValue.Field(i)
+			f := objType.Field(i)
+			qTag := f.Tag.Get("q")
+
+			// if the field has a 'q' tag, it goes in the query string
+			if qTag != "" {
+				tags := strings.Split(qTag, ",")
+				// if the field is set, add it to the slice of query pieces
+				if !isZero(v) {
+				loop:
+					switch v.Kind() {
+					case reflect.Ptr:
+						v = v.Elem()
+						goto loop
+					case reflect.String:
+						params.Add(tags[0], v.String())
+					case reflect.Int:
+						params.Add(tags[0], strconv.FormatInt(v.Int(), 10))
+					case reflect.Bool:
+						params.Add(tags[0], strconv.FormatBool(v.Bool()))
+					case reflect.Slice:
+						switch v.Type().Elem() {
+						case reflect.TypeOf(0):
+							for i := 0; i < v.Len(); i++ {
+								params.Add(tags[0], strconv.FormatInt(v.Index(i).Int(), 10))
+							}
+						default:
+							for i := 0; i < v.Len(); i++ {
+								params.Add(tags[0], v.Index(i).String())
+							}
+						}
+					case reflect.Map:
+						if v.Type().Key().Kind() == reflect.String && v.Type().Elem().Kind() == reflect.String {
+							var s []string
+							for _, k := range v.MapKeys() {
+								value := v.MapIndex(k).String()
+								s = append(s, fmt.Sprintf("'%s':'%s'", k.String(), value))
+							}
+							params.Add(tags[0], fmt.Sprintf("{%s}", strings.Join(s, ", ")))
+						}
+					}
+				} else {
+					// if the field has a 'beempty' tag, it can have a zero-value
+					for j := 1; j < len(tags); j++ {
+						if tags[j] == beEmptyValue {
+							params.Add(tags[0], "")
+							continue
+						}
+					}
+
+					// if the field has a 'required' tag, it can't have a zero-value
+					if requiredTag := f.Tag.Get("required"); requiredTag == "true" {
+						return &url.URL{}, fmt.Errorf("required query parameter [%s] not set", f.Name)
+					}
+				}
+			}
+		}
+
+		return &url.URL{RawQuery: params.Encode()}, nil
+	}
+
+	// return an error if the underlying type of 'opts' isn't a struct
+	return nil, fmt.Errorf("the given object type is not a struct")
+}
 func (s *Parser) MapMe(pObj interface{}, pParent string) (map[string]interface{}, error) {
 	objValue := reflect.ValueOf(pObj)
 
