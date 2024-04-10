@@ -5,12 +5,17 @@ import (
 	"fmt"
 	"net/url"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 
 	lError "github.com/cuongpiger/joat/error"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+)
+
+var (
+	isAlphanumericRegex = regexp.MustCompile(`^[a-zA-Z0-9]*$`).MatchString
 )
 
 type Parser struct {
@@ -232,4 +237,9 @@ func (s *Parser) MapMe(pObj interface{}, pParent string) (map[string]interface{}
 
 	// return an error if the underlying type of 'opts' isn't a struct
 	return nil, fmt.Errorf("options type is not a struct")
+}
+
+// StringIsAlphanumeric returns true if a given string contains only English letters or numbers
+func (s *Parser) StringIsAlphanumeric(ps string) bool {
+	return isAlphanumericRegex(ps)
 }

@@ -1,6 +1,8 @@
 package parser
 
-import "sync"
+import (
+	"sync"
+)
 
 var (
 	parserIns  IParser
