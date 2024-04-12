@@ -8,29 +8,28 @@ import (
 )
 
 type BackOff struct {
-	Steps                         int
 	Revert                        bool
 	ExponentialBackoffCeilingSecs int64
+	Timeout                       time.Duration
 
 	attempts int
 }
 
-func NewBackOff(psteps int, pebcs int64, prev bool) *BackOff {
+func NewBackOff(psteps int, pebcs int64, prev bool, pto time.Duration) *BackOff {
 	attempts := 0
 	if prev {
 		attempts = psteps
 	}
 
 	return &BackOff{
-		Steps:                         psteps,
 		Revert:                        prev,
 		ExponentialBackoffCeilingSecs: pebcs,
+		Timeout:                       pto,
 		attempts:                      attempts,
 	}
 }
 
 func (s *BackOff) Step() time.Duration {
-	s.Steps--
 	s.attemp()
 	return s.delay()
 }
@@ -53,5 +52,9 @@ func (s *BackOff) attemp() {
 		s.attempts--
 	} else {
 		s.attempts++
+	}
+
+	if s.attempts < 0 {
+		s.attempts = 1
 	}
 }

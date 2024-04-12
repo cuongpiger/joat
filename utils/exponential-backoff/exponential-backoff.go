@@ -5,15 +5,11 @@ import (
 )
 
 func ExponentialBackoff(pbackOff *BackOff, pcondiFunc ConditionFunc) error {
-	for pbackOff.Steps > 0 {
+	start := time.Now()
+	for time.Now().Sub(start) < pbackOff.Timeout {
 		if ok, err := pcondiFunc(); err != nil || ok {
 			return err
 		}
-
-		if pbackOff.Steps == 1 {
-			break
-		}
-
 		time.Sleep(pbackOff.Step())
 	}
 
