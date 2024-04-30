@@ -8,6 +8,15 @@ type Queue[T comparable] interface {
 	Top() (T, bool)
 }
 
-func NewQueue[T comparable]() Queue[T] {
-	return newThreadUnsafeQueue[T]()
+func NewQueue[T comparable](pvals ...T) Queue[T] {
+	queue := newThreadSafeQueueWithSize[T](len(pvals))
+	for _, item := range pvals {
+		queue.Push(item)
+	}
+
+	return queue
+}
+
+func NewQueueWithSize[T comparable](psize int) Queue[T] {
+	return newThreadSafeQueueWithSize[T](psize)
 }
