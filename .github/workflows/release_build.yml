@@ -1,5 +1,8 @@
 name: Release Joat project
 
+builds:
+  - skip: true
+
 on:
   push:
     branches:
