@@ -2,13 +2,9 @@ name: Release Joat project
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
   pull_request:
-    branches:
-      - main
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
@@ -18,6 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Exit if not on production branch
+        if: endsWith(github.event.base_ref, 'main') == false
+        run: exit -1
+
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
         with:
