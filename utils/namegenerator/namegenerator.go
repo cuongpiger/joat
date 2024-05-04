@@ -1,4 +1,4 @@
-package namesgenerator
+package namegenerator
 
 import (
 	"math/rand"
