@@ -13,3 +13,7 @@ func Minute(pminute uint64) ltime.Duration {
 func Hour(phour uint64) ltime.Duration {
 	return ltime.Duration(phour) * ltime.Hour
 }
+
+func NowUnixTimestamp() int64 {
+	return ltime.Now().UnixMicro()
+}
