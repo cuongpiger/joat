@@ -56,8 +56,8 @@ func (s *threadSafeHeap) Adjust(pitem, pnew Item) Item {
 }
 
 func (s *threadSafeHeap) Do(pit ItemIterator) {
-	s.RLock()
-	defer s.RUnlock()
+	s.Lock()
+	defer s.Unlock()
 	s.heap.Do(pit)
 }
 
