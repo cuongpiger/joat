@@ -21,21 +21,6 @@ type Heap interface {
 	Clear()
 }
 
-// Interface is basic interface that all Heaps implement.
-type Interface interface {
-	// Insert add an element to the heap and returns it
-	Insert(v Item) Item
-
-	// DeleteMin deletes and returns the smallest element
-	DeleteMin() Item
-
-	// FindMin returns the minimum element
-	FindMin() Item
-
-	// Clear removes all items
-	Clear()
-}
-
 // toDelete details what item to remove in a node call.
 type toDelete int
 
