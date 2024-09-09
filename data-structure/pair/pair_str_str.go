@@ -1,13 +1,13 @@
 package pair
 
 type PairStringString struct {
-	Key   string
-	Value string
+	First  string
+	Second string
 }
 
-func NewPairStringString(pkey, pvalue string) PairStringString {
+func NewPairStringString(pfirst, psecond string) PairStringString {
 	return PairStringString{
-		Key:   pkey,
-		Value: pvalue,
+		First:  pfirst,
+		Second: psecond,
 	}
 }
